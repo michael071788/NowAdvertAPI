@@ -11,6 +11,31 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  User.findById(id, function (err, docs) {
+    if (err) {
+      console.log(err);
+      res.send("User not found");
+    } else {
+      console.log("Result : ", docs);
+      res.send(docs);
+    }
+  });
+});
+
+router.patch("/update/:id", async (req, res) => {
+  try {
+    const userId = await User.findById(req.params.id);
+    Object.assign(userId, req.body);
+    userId.save();
+    res.send({ data: userId });
+  } catch {
+    res.status(404).send({ error: "User is not found!" });
+  }
+});
+
 router.post("/signup", async (req, res) => {
   try {
     // validate user inputs
