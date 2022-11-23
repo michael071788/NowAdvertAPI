@@ -5,18 +5,19 @@ require("dotenv").config();
 
 const connection = require("./connection/db");
 const Post = require("./models/post");
+const fs = require("fs");
 
 const { ImageModel } = require("./models/testImage");
 
 const multer = require("multer");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "Images");
+    cb(null, "uploads");
   },
   filename: (req, file, cb) => {
     console.log(file);
-    // cb(null, Date.now() + path.extname(file.originalname));
-    cb(null, file.fieldname + "-" + Date.now());
+    cb(null, Date.now() + path.extname(file.originalname));
+    //cb(null, file.fieldname + "-" + Date.now());
     // cb(null, file.originalname);
   },
 });
@@ -38,7 +39,7 @@ const PORT = process.env.PORT || 14961;
 connection();
 
 app
-  .use(express.urlencoded({ extended: false }))
+  .use(express.urlencoded({ extended: true }))
   .use(express.json())
   .use(cors())
   .use(express.static(path.join(__dirname, "public")))
@@ -55,15 +56,24 @@ app
     const allData = await ImageModel.find();
     res.json(allData);
   })
+  .get("/image/findone", async (req, res) => {
+    ImageModel.findOne({}, function (err, img) {
+      if (err) res.send(err);
+
+      // res.contentType("json");
+      res.send(img);
+    }).sort({ createdAt: "desc" });
+  })
 
   .post("/upload", async (req, res) => {
     upload(req, res, (err) => {
       if (err) {
         console.log(err);
       } else {
+        console.log("req.file.filename: ", req.file.filename);
         const newImage = new ImageModel({
           image: {
-            data: req.file.filename,
+            data: fs.readFileSync("uploads/" + req.file.filename),
             contentType: "image/png",
           },
         });
