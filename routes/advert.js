@@ -5,6 +5,7 @@ router.get("/list", async (req, res) => {
   try {
     const advertLists = await AdvertList.find();
     res.json(advertLists);
+    // console.log(advertLists);
   } catch (err) {
     res.json({ message: err });
   }
@@ -22,6 +23,7 @@ router.post("/", async (req, res) => {
       data,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: "Internal Server Error" });
   }
 });
