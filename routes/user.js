@@ -11,20 +11,18 @@ router.get("/", async (req, res) => {
   }
 });
 
+// find specific user
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
-
-  User.findById(id, function (err, docs) {
-    if (err) {
-      console.log(err);
-      res.send("User not found");
-    } else {
-      console.log("Result : ", docs);
-      res.send(docs);
-    }
-  });
+  try {
+    const userData = await User.findById(id);
+    res.json(userData);
+  } catch (err) {
+    res.json({ message: err });
+  }
 });
 
+// update user info
 router.patch("/update/:id", async (req, res) => {
   try {
     const userId = await User.findById(req.params.id);
@@ -36,6 +34,7 @@ router.patch("/update/:id", async (req, res) => {
   }
 });
 
+// update user password
 router.patch("/update-password/:id", async (req, res) => {
   try {
     const userData = await User.findById(req.params.id);
@@ -47,17 +46,10 @@ router.patch("/update-password/:id", async (req, res) => {
 
     if (!isMatch) {
       // Hash the new password
-      // const hashedPassword = await bcrypt.hash(req.body.newPassword, 10);
       return res.status(401).send({ message: "Invalid Password" });
     }
 
     if (!userData) return res.status(401).send({ message: "User not found" });
-
-    // if (userData.password !== hashedPassword) {
-    //   console.log(userData.password);
-    //   console.log(req.body.currentPassword);
-    //   return res.status(401).send({ message: "Invalid Password" });
-    // }
 
     if (req.body.newPassword !== req.body.confirmPassword) {
       return res.status(401).send({ message: "Password not match" });
@@ -85,6 +77,7 @@ router.patch("/update-password/:id", async (req, res) => {
   }
 });
 
+// register user
 router.post("/signup", async (req, res) => {
   try {
     // validate user inputs
@@ -129,5 +122,39 @@ router.post("/signup", async (req, res) => {
     res.status(500).send({ message: "Internal Server Error" });
   }
 });
+
+// get all user tickets
+router.post("/tickets/:id", async (req, res) => {
+  User.findByIdAndUpdate(
+    req.params.id,
+    {
+      $push: {
+        earnedTickets: {
+          ...req.body,
+        },
+      },
+    },
+    {
+      new: true,
+    }
+  ).exec((err, result) => {
+    if (err) {
+      return res.status(422).json({ error: err });
+    } else {
+      res.status(200).send({
+        message: "success",
+        result,
+      });
+    }
+  });
+});
+
+// get user profile image
+router.get("/profile-image/:id", async (req, res) => {
+  const profileImage = await User.findById(req.params.id);
+  res.send(profileImage.profile_image);
+});
+
+// upload user profile image
 
 module.exports = router;

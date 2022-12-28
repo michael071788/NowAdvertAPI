@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   profile_image: { data: Buffer, contentType: String },
   // tickets: [{ type: Object, ref: "ticket" }],
+  // profile: { type: String },
   earnedTickets: [
     // Tickets,
     {
