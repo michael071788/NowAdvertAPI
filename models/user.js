@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const Joi = require("joi");
 const passwordComplexity = require("joi-password-complexity");
+const { Tickets } = require("./tickets");
+const { ObjectId } = mongoose.Schema.Types;
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true },
@@ -10,6 +12,17 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   phone: { type: String, required: true },
   password: { type: String, required: true },
+  profile_image: { data: Buffer, contentType: String },
+
+  earnedTickets: [
+    // Tickets,
+    {
+      videoTicket: { type: ObjectId, ref: "advert_list" },
+      ticketNumber: { type: String },
+      status: { type: String },
+      // createdAt: { type: Date, expires: "1m", default: Date.now },
+    },
+  ],
 });
 
 userSchema.methods.generateAuthToken = function () {

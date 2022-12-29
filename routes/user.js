@@ -11,20 +11,18 @@ router.get("/", async (req, res) => {
   }
 });
 
+// find specific user
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
-
-  User.findById(id, function (err, docs) {
-    if (err) {
-      console.log(err);
-      res.send("User not found");
-    } else {
-      console.log("Result : ", docs);
-      res.send(docs);
-    }
-  });
+  try {
+    const userData = await User.findById(id);
+    res.json(userData);
+  } catch (err) {
+    res.json({ message: err });
+  }
 });
 
+// update user info
 router.patch("/update/:id", async (req, res) => {
   try {
     const userId = await User.findById(req.params.id);
@@ -36,6 +34,50 @@ router.patch("/update/:id", async (req, res) => {
   }
 });
 
+// update user password
+router.patch("/update-password/:id", async (req, res) => {
+  try {
+    const userData = await User.findById(req.params.id);
+
+    const isMatch = await bcrypt.compare(
+      req.body.currentPassword,
+      userData.password
+    );
+
+    if (!isMatch) {
+      // Hash the new password
+      return res.status(401).send({ message: "Invalid Password" });
+    }
+
+    if (!userData) return res.status(401).send({ message: "User not found" });
+
+    if (req.body.newPassword !== req.body.confirmPassword) {
+      return res.status(401).send({ message: "Password not match" });
+    }
+
+    const salt = await bcrypt.genSalt(Number(process.env.SALT));
+    const hashPassword = await bcrypt.hash(req.body.newPassword, salt);
+
+    await User.findByIdAndUpdate(userData.id, {
+      $set: {
+        password: hashPassword,
+      },
+    });
+
+    // userData.save();
+
+    res.status(201).send({
+      message: "successfully",
+      status: res.statusCode,
+      // userData,
+    });
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+    console.log(error);
+  }
+});
+
+// register user
 router.post("/signup", async (req, res) => {
   try {
     // validate user inputs
@@ -50,6 +92,7 @@ router.post("/signup", async (req, res) => {
         .status(400)
         .send({ message: "User with given email already Exist!" });
 
+    // validate if the phone exists
     const phone = await User.findOne({ phone: req.body.phone });
     if (phone)
       return res
@@ -63,7 +106,8 @@ router.post("/signup", async (req, res) => {
     await new User({ ...req.body, password: hashPassword }).save();
 
     let data = new User({
-      name: req.body.name,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
       email: req.body.email,
       phone: req.body.phone,
       password: req.body.password,
@@ -78,5 +122,39 @@ router.post("/signup", async (req, res) => {
     res.status(500).send({ message: "Internal Server Error" });
   }
 });
+
+// get all user tickets
+router.post("/tickets/:id", async (req, res) => {
+  User.findByIdAndUpdate(
+    req.params.id,
+    {
+      $push: {
+        earnedTickets: {
+          ...req.body,
+        },
+      },
+    },
+    {
+      new: true,
+    }
+  ).exec((err, result) => {
+    if (err) {
+      return res.status(422).json({ error: err });
+    } else {
+      res.status(200).send({
+        message: "success",
+        result,
+      });
+    }
+  });
+});
+
+// get user profile image
+router.get("/profile-image/:id", async (req, res) => {
+  const profileImage = await User.findById(req.params.id);
+  res.send(profileImage.profile_image);
+});
+
+// upload user profile image
 
 module.exports = router;
