@@ -1,14 +1,14 @@
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
+const { Buffer } = require("buffer");
 require("dotenv").config();
 
 const connection = require("./connection/db");
-const Post = require("./models/post");
+
 const fs = require("fs");
 
 const { ImageModel } = require("./models/testImage");
-const { countAdvertLIst } = require("./models/count");
 
 const multer = require("multer");
 
@@ -33,9 +33,7 @@ const homeRoutes = require("./routes/home");
 const advertRoutes = require("./routes/advert");
 
 const { User } = require("./models/user");
-const { AdvertList } = require("./models/advert_list");
-const { Tickets } = require("./models/tickets");
-// const { isAuth } = require("./middleware/auth");
+const { collection } = require("./models/post");
 
 const app = express();
 const PORT = process.env.PORT || 14961;
@@ -69,7 +67,6 @@ app
       if (err) {
         console.log(err);
       } else {
-        console.log("req.file mobile ", req.file);
         const newImage = new ImageModel({
           image: {
             // data: fs.readFileSync("uploads/" + req.file.filename),
@@ -91,11 +88,14 @@ app
       if (err) {
         console.log(err);
       } else {
+        const imageData = fs.readFileSync("uploads/" + req.file.filename);
+        const imageBase64 = Buffer.from(imageData).toString("base64");
+
         await User.findByIdAndUpdate(userData.id, {
           $set: {
             profile_image: {
               // data: fs.readFileSync("/../uploads/" + req.file.filename),
-              data: fs.readFileSync("uploads/" + req.file.filename),
+              data: imageBase64,
               contentType: "image/png",
             },
           },
