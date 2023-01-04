@@ -16,8 +16,7 @@ router.get("/:id", async (req, res) => {
   const id = req.params.id;
   try {
     const userData = await User.findById(id);
-
-    res.json(userData);
+    res.send(userData);
   } catch (err) {
     res.json({ message: err });
   }

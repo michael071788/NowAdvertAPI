@@ -89,22 +89,25 @@ app
         console.log(err);
       } else {
         const imageData = fs.readFileSync("uploads/" + req.file.filename);
+
         const imageBase64 = Buffer.from(imageData).toString("base64");
+
+        const type = "image/png";
 
         await User.findByIdAndUpdate(userData.id, {
           $set: {
             profile_image: {
-              // data: fs.readFileSync("/../uploads/" + req.file.filename),
               data: imageBase64,
-              contentType: "image/png",
+              contentType: type,
             },
+            hasProfile: true,
           },
         });
 
         userData.save();
 
         res.status(201).send({
-          message: " successfully",
+          message: "successfully",
           status: res.statusCode,
           userData,
         });

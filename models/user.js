@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   phone: { type: String, required: true },
   password: { type: String, required: true },
-  profile_image: { data: Buffer, contentType: String },
+  hasProfile: { type: Boolean, default: false },
+  profile_image: { data: String, contentType: String },
 
   earnedTickets: [
     // Tickets,
