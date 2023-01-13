@@ -9,6 +9,7 @@ const otp = Math.floor(1000 + Math.random() * 9000); // generate a 4-digit OTP
 
 const connection = require("./connection/db");
 
+<<<<<<< HEAD
 // const sendEmail = (user) => {
 //   return new Promise((resolve, reject) => {
 //     const transporter = nodemailer.createTransport({
@@ -36,6 +37,8 @@ const connection = require("./connection/db");
 //   });
 // };
 
+=======
+>>>>>>> 8577eef14e613b5a9158762bcd4324453c153add
 const fs = require("fs");
 
 const { ImageModel } = require("./models/testImage");
@@ -63,12 +66,16 @@ const homeRoutes = require("./routes/home");
 const advertRoutes = require("./routes/advert");
 
 const { User } = require("./models/user");
+const { collection } = require("./models/post");
 
 const app = express();
 const PORT = process.env.PORT || 14961;
 
 // db connection
 connection();
+
+// const random = Math.floor(Math.random() * 1000000000);
+// console.log("random ", random);
 
 app
   .use(express.urlencoded({ extended: true }))
@@ -109,6 +116,41 @@ app
   })
   .post("/profile-image/:id", async (req, res) => {
     const userData = await User.findById(req.params.id);
+<<<<<<< HEAD
+=======
+
+    upload(req, res, async (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        const imageData = fs.readFileSync("uploads/" + req.file.filename);
+
+        const imageBase64 = Buffer.from(imageData).toString("base64");
+
+        const type = "image/png";
+
+        await User.findByIdAndUpdate(userData.id, {
+          $set: {
+            profile_image: {
+              data: imageBase64,
+              contentType: type,
+            },
+            hasProfile: true,
+          },
+        });
+
+        userData.save();
+
+        res.status(201).send({
+          message: "successfully",
+          status: res.statusCode,
+          userData,
+        });
+      }
+    });
+  })
+  .listen(PORT, () => console.log(`Listening on ${PORT}`));
+>>>>>>> 8577eef14e613b5a9158762bcd4324453c153add
 
     upload(req, res, async (err) => {
       if (err) {
