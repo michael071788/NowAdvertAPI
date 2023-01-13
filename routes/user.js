@@ -1,6 +1,36 @@
 const router = require("express").Router();
 const { User, validate } = require("../models/user");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+
+const otp = Math.floor(1000 + Math.random() * 9000); // generate a 4-digit OTP
+
+const sendEmail = (user) => {
+  return new Promise((resolve, reject) => {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.myEmail,
+        pass: process.env.myPassword,
+      },
+      tls: { rejectUnauthorized: false },
+    });
+    const mail_config = {
+      from: process.env.myEmail,
+      // to: "mackdaniel06@gmail.com",
+      to: user,
+      subject: "Testing Email",
+      text: `Your test otp is ${otp}`,
+    };
+    transporter.sendMail(mail_config, function (error, info) {
+      if (error) {
+        console.log("email error", error);
+        return reject({ message: "An error occured" });
+      }
+      return resolve({ message: "Email sent successfully" });
+    });
+  });
+};
 
 router.get("/", async (req, res) => {
   try {
@@ -16,6 +46,7 @@ router.get("/:id", async (req, res) => {
   const id = req.params.id;
   try {
     const userData = await User.findById(id);
+    // console.log("userdata", userData);
     res.json(userData);
   } catch (err) {
     res.json({ message: err });
@@ -85,7 +116,7 @@ router.post("/signup", async (req, res) => {
     if (error)
       return res.status(400).send({ message: error.details[0].message });
 
-    // validate if the email exists
+    // validate if the email already exists
     const user = await User.findOne({ email: req.body.email });
     if (user)
       return res
@@ -99,11 +130,17 @@ router.post("/signup", async (req, res) => {
         .status(400)
         .send({ message: "User with given phone number already Exist!" });
 
+    // const otp = Math.floor(1000 + Math.random() * 9000); // generate a 4-digit OTP
+
     // to encrypt password
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const hashPassword = await bcrypt.hash(req.body.password, salt);
 
-    await new User({ ...req.body, password: hashPassword }).save();
+    // sendEmail();
+    // .then((response) => res.send(response.message))
+    // .catch((error) => res.status(500).send(error.message));
+
+    await new User({ ...req.body, OTP: otp, password: hashPassword }).save();
 
     let data = new User({
       firstName: req.body.firstName,
@@ -155,6 +192,37 @@ router.get("/profile-image/:id", async (req, res) => {
   res.send(profileImage.profile_image);
 });
 
-// upload user profile image
+router.post("/verify-otp", async (req, res) => {
+  const user = await User.findOne({ email: req.body.email });
 
+  if (!user) {
+    return res.status(404).send("User not found.");
+  }
+
+  if (user.OTP === req.body.otp) {
+    user.isVerified = true;
+
+    const token = user.generateAuthToken();
+
+    await user.save();
+
+    return res.status(200).send({
+      message: "Email verified successfully.",
+      token: token,
+      status: res.statusCode,
+      user: user,
+    });
+  } else {
+    return res.status(401).send({ message: "Invalid OTP." });
+  }
+});
+
+router.post("/generate-otp", (req, res) => {
+  const user = req.body.email;
+  console.log("user", user);
+
+  sendEmail(user)
+    .then((response) => res.send(response.message))
+    .catch((error) => res.status(500).send(error.message));
+});
 module.exports = router;

@@ -1,14 +1,44 @@
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
+const { Buffer } = require("buffer");
 require("dotenv").config();
+const nodemailer = require("nodemailer");
+
+const otp = Math.floor(1000 + Math.random() * 9000); // generate a 4-digit OTP
 
 const connection = require("./connection/db");
-const Post = require("./models/post");
+
+// const sendEmail = (user) => {
+//   return new Promise((resolve, reject) => {
+//     const transporter = nodemailer.createTransport({
+//       service: "gmail",
+//       auth: {
+//         user: process.env.myEmail,
+//         pass: process.env.myPassword,
+//       },
+//       tls: { rejectUnauthorized: false },
+//     });
+//     const mail_config = {
+//       from: process.env.myEmail,
+//       // to: "mackdaniel06@gmail.com",
+//       to: user,
+//       subject: "Testing Email",
+//       text: `Your test otp is ${otp}`,
+//     };
+//     transporter.sendMail(mail_config, function (error, info) {
+//       if (error) {
+//         console.log("email error", error);
+//         return reject({ message: "An error occured" });
+//       }
+//       return resolve({ message: "Email sent successfully" });
+//     });
+//   });
+// };
+
 const fs = require("fs");
 
 const { ImageModel } = require("./models/testImage");
-const { countAdvertLIst } = require("./models/count");
 
 const multer = require("multer");
 
@@ -33,18 +63,12 @@ const homeRoutes = require("./routes/home");
 const advertRoutes = require("./routes/advert");
 
 const { User } = require("./models/user");
-const { AdvertList } = require("./models/advert_list");
-const { Tickets } = require("./models/tickets");
-// const { isAuth } = require("./middleware/auth");
 
 const app = express();
 const PORT = process.env.PORT || 14961;
 
 // db connection
 connection();
-
-// const random = Math.floor(Math.random() * 1000000000);
-// console.log("random ", random);
 
 app
   .use(express.urlencoded({ extended: true }))
@@ -69,7 +93,6 @@ app
       if (err) {
         console.log(err);
       } else {
-        console.log("req.file mobile ", req.file);
         const newImage = new ImageModel({
           image: {
             // data: fs.readFileSync("uploads/" + req.file.filename),
@@ -91,26 +114,38 @@ app
       if (err) {
         console.log(err);
       } else {
+        const imageData = fs.readFileSync("uploads/" + req.file.filename);
+
+        const imageBase64 = Buffer.from(imageData).toString("base64");
+        // console.log(imageBase64);
+        const type = "image/png";
+
         await User.findByIdAndUpdate(userData.id, {
           $set: {
             profile_image: {
-              // data: fs.readFileSync("/../uploads/" + req.file.filename),
-              data: fs.readFileSync("uploads/" + req.file.filename),
-              contentType: "image/png",
+              data: imageBase64,
+              contentType: type,
             },
+            hasProfile: true,
           },
         });
 
         userData.save();
 
         res.status(201).send({
-          message: " successfully",
+          message: "successfully",
           status: res.statusCode,
           userData,
         });
       }
     });
   })
-  .listen(PORT, () => console.log(`Listening on ${PORT}`));
+  // .post("/generate-otp", (req, res) => {
+  //   const user = req.body.email;
+  //   console.log("user", user);
 
-//comment
+  //   sendEmail(user)
+  //     .then((response) => res.send(response.message))
+  //     .catch((error) => res.status(500).send(error.message));
+  // })
+  .listen(PORT, () => console.log(`Listening on ${PORT}`));
