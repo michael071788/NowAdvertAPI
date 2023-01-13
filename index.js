@@ -9,7 +9,6 @@ const otp = Math.floor(1000 + Math.random() * 9000); // generate a 4-digit OTP
 
 const connection = require("./connection/db");
 
-<<<<<<< HEAD
 // const sendEmail = (user) => {
 //   return new Promise((resolve, reject) => {
 //     const transporter = nodemailer.createTransport({
@@ -37,8 +36,6 @@ const connection = require("./connection/db");
 //   });
 // };
 
-=======
->>>>>>> 8577eef14e613b5a9158762bcd4324453c153add
 const fs = require("fs");
 
 const { ImageModel } = require("./models/testImage");
@@ -115,10 +112,6 @@ app
     });
   })
   .post("/profile-image/:id", async (req, res) => {
-    const userData = await User.findById(req.params.id);
-<<<<<<< HEAD
-=======
-
     upload(req, res, async (err) => {
       if (err) {
         console.log(err);
@@ -149,45 +142,4 @@ app
       }
     });
   })
-  .listen(PORT, () => console.log(`Listening on ${PORT}`));
->>>>>>> 8577eef14e613b5a9158762bcd4324453c153add
-
-    upload(req, res, async (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        const imageData = fs.readFileSync("uploads/" + req.file.filename);
-
-        const imageBase64 = Buffer.from(imageData).toString("base64");
-        // console.log(imageBase64);
-        const type = "image/png";
-
-        await User.findByIdAndUpdate(userData.id, {
-          $set: {
-            profile_image: {
-              data: imageBase64,
-              contentType: type,
-            },
-            hasProfile: true,
-          },
-        });
-
-        userData.save();
-
-        res.status(201).send({
-          message: "successfully",
-          status: res.statusCode,
-          userData,
-        });
-      }
-    });
-  })
-  // .post("/generate-otp", (req, res) => {
-  //   const user = req.body.email;
-  //   console.log("user", user);
-
-  //   sendEmail(user)
-  //     .then((response) => res.send(response.message))
-  //     .catch((error) => res.status(500).send(error.message));
-  // })
   .listen(PORT, () => console.log(`Listening on ${PORT}`));

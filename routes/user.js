@@ -46,12 +46,11 @@ router.get("/:id", async (req, res) => {
   const id = req.params.id;
   try {
     const userData = await User.findById(id);
-<<<<<<< HEAD
+
     // console.log("userdata", userData);
     res.json(userData);
-=======
+
     res.send(userData);
->>>>>>> 8577eef14e613b5a9158762bcd4324453c153add
   } catch (err) {
     res.json({ message: err });
   }
@@ -196,7 +195,6 @@ router.get("/profile-image/:id", async (req, res) => {
   res.send(profileImage.profile_image);
 });
 
-<<<<<<< HEAD
 router.post("/verify-otp", async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
 
@@ -230,8 +228,5 @@ router.post("/generate-otp", (req, res) => {
     .then((response) => res.send(response.message))
     .catch((error) => res.status(500).send(error.message));
 });
-=======
-// upload user profile image
 
->>>>>>> 8577eef14e613b5a9158762bcd4324453c153add
 module.exports = router;
