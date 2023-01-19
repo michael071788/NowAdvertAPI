@@ -13,13 +13,8 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   hasProfile: { type: Boolean, default: false },
   profile_image: { data: String, contentType: String },
-<<<<<<< HEAD
-  earnedTickets: [
-=======
-
   earnedTickets: [
     // Tickets,
->>>>>>> 8577eef14e613b5a9158762bcd4324453c153add
     {
       videoTicket: { type: ObjectId, ref: "advert_list" },
       ticketNumber: { type: String },
@@ -27,11 +22,8 @@ const userSchema = new mongoose.Schema({
       // createdAt: { type: Date, expires: "1m", default: Date.now },
     },
   ],
-<<<<<<< HEAD
   OTP: { type: String },
   isVerified: { type: Boolean, default: false },
-=======
->>>>>>> 8577eef14e613b5a9158762bcd4324453c153add
 });
 
 userSchema.methods.generateAuthToken = function () {
