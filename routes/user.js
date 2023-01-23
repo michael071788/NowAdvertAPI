@@ -10,13 +10,13 @@ const sendEmail = (user) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.myEmail,
-        pass: process.env.myPassword,
+        user: process.env.appEmail,
+        pass: process.env.appPassword,
       },
       tls: { rejectUnauthorized: false },
     });
     const mail_config = {
-      from: process.env.myEmail,
+      from: process.env.appEmail,
       to: user,
       subject: "Testing Email",
       text: `Your test otp is ${otp}`,
