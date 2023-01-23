@@ -6,7 +6,6 @@ router.get("/list", async (req, res) => {
   try {
     const advertLists = await AdvertList.find();
     res.json(advertLists);
-    // console.log(advertLists);
   } catch (err) {
     res.json({ message: err });
   }

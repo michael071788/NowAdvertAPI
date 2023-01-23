@@ -17,7 +17,6 @@ const sendEmail = (user) => {
     });
     const mail_config = {
       from: process.env.myEmail,
-      // to: "mackdaniel06@gmail.com",
       to: user,
       subject: "Testing Email",
       text: `Your test otp is ${otp}`,
@@ -47,7 +46,6 @@ router.get("/:id", async (req, res) => {
   try {
     const userData = await User.findById(id);
 
-    // console.log("userdata", userData);
     res.json(userData);
 
     res.send(userData);
@@ -98,12 +96,9 @@ router.patch("/update-password/:id", async (req, res) => {
       },
     });
 
-    // userData.save();
-
     res.status(201).send({
       message: "successfully",
       status: res.statusCode,
-      // userData,
     });
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
@@ -133,15 +128,9 @@ router.post("/signup", async (req, res) => {
         .status(400)
         .send({ message: "User with given phone number already Exist!" });
 
-    // const otp = Math.floor(1000 + Math.random() * 9000); // generate a 4-digit OTP
-
     // to encrypt password
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const hashPassword = await bcrypt.hash(req.body.password, salt);
-
-    // sendEmail();
-    // .then((response) => res.send(response.message))
-    // .catch((error) => res.status(500).send(error.message));
 
     await new User({ ...req.body, OTP: otp, password: hashPassword }).save();
 
@@ -222,7 +211,6 @@ router.post("/verify-otp", async (req, res) => {
 
 router.post("/generate-otp", (req, res) => {
   const user = req.body.email;
-  console.log("user", user);
 
   sendEmail(user)
     .then((response) => res.send(response.message))

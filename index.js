@@ -3,38 +3,8 @@ const path = require("path");
 const cors = require("cors");
 const { Buffer } = require("buffer");
 require("dotenv").config();
-const nodemailer = require("nodemailer");
-
-const otp = Math.floor(1000 + Math.random() * 9000); // generate a 4-digit OTP
 
 const connection = require("./connection/db");
-
-// const sendEmail = (user) => {
-//   return new Promise((resolve, reject) => {
-//     const transporter = nodemailer.createTransport({
-//       service: "gmail",
-//       auth: {
-//         user: process.env.myEmail,
-//         pass: process.env.myPassword,
-//       },
-//       tls: { rejectUnauthorized: false },
-//     });
-//     const mail_config = {
-//       from: process.env.myEmail,
-//       // to: "mackdaniel06@gmail.com",
-//       to: user,
-//       subject: "Testing Email",
-//       text: `Your test otp is ${otp}`,
-//     };
-//     transporter.sendMail(mail_config, function (error, info) {
-//       if (error) {
-//         console.log("email error", error);
-//         return reject({ message: "An error occured" });
-//       }
-//       return resolve({ message: "Email sent successfully" });
-//     });
-//   });
-// };
 
 const fs = require("fs");
 
@@ -48,12 +18,9 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
-    //cb(null, file.fieldname + "-" + Date.now());
-    // cb(null, file.originalname);
   },
 });
 const upload = multer({ storage: storage }).single("image");
-// const upload = multer({ storage: storage });
 
 // import routes
 const postRoutes = require("./routes/posts");
@@ -63,16 +30,12 @@ const homeRoutes = require("./routes/home");
 const advertRoutes = require("./routes/advert");
 
 const { User } = require("./models/user");
-const { collection } = require("./models/post");
 
 const app = express();
 const PORT = process.env.PORT || 14961;
 
 // db connection
 connection();
-
-// const random = Math.floor(Math.random() * 1000000000);
-// console.log("random ", random);
 
 app
   .use(express.urlencoded({ extended: true }))
@@ -99,7 +62,6 @@ app
       } else {
         const newImage = new ImageModel({
           image: {
-            // data: fs.readFileSync("uploads/" + req.file.filename),
             data: fs.readFileSync("uploads/" + req.file.filename),
             contentType: "image/png",
           },

@@ -14,12 +14,10 @@ const userSchema = new mongoose.Schema({
   hasProfile: { type: Boolean, default: false },
   profile_image: { data: String, contentType: String },
   earnedTickets: [
-    // Tickets,
     {
       videoTicket: { type: ObjectId, ref: "advert_list" },
       ticketNumber: { type: String },
       status: { type: String },
-      // createdAt: { type: Date, expires: "1m", default: Date.now },
     },
   ],
   OTP: { type: String },
