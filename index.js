@@ -8,8 +8,6 @@ const connection = require("./connection/db");
 
 const fs = require("fs");
 
-const { ImageModel } = require("./models/testImage");
-
 const multer = require("multer");
 
 const storage = multer.diskStorage({
@@ -51,28 +49,6 @@ app
   .use("/api/users", userRoutes)
   .use("/api", authRoutes)
   .use("/api/advert", advertRoutes)
-  .get("/image", async (req, res) => {
-    const allData = await ImageModel.find();
-    res.json(allData);
-  })
-  .post("/upload", async (req, res) => {
-    upload(req, res, (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        const newImage = new ImageModel({
-          image: {
-            data: fs.readFileSync("uploads/" + req.file.filename),
-            contentType: "image/png",
-          },
-        });
-        newImage
-          .save()
-          .then(() => res.send("Successful"))
-          .catch((err) => console.log(err));
-      }
-    });
-  })
   .post("/profile-image/:id", async (req, res) => {
     upload(req, res, async (err) => {
       if (err) {
