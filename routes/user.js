@@ -148,7 +148,7 @@ router.post("/signup", async (req, res) => {
       data,
     });
   } catch (error) {
-    res.status(500).send({ message: "Internal Server Error" });
+    res.status(500).send({ message: "Internal server error" });
   }
 });
 

@@ -50,14 +50,14 @@ app
   .use("/api", authRoutes)
   .use("/api/advert", advertRoutes)
   .post("/profile-image/:id", async (req, res) => {
+    const userData = await User.findById(req.params.id);
+
     upload(req, res, async (err) => {
       if (err) {
         console.log(err);
       } else {
         const imageData = fs.readFileSync("uploads/" + req.file.filename);
-
         const imageBase64 = Buffer.from(imageData).toString("base64");
-
         const type = "image/png";
 
         await User.findByIdAndUpdate(userData.id, {
@@ -72,7 +72,7 @@ app
 
         userData.save();
 
-        res.status(201).send({
+        return res.status(201).send({
           message: "successfully",
           status: res.statusCode,
           userData,
