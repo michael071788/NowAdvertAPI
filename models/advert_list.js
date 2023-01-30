@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Schema.Types;
 
 const adverListSchema = mongoose.Schema({
   companyName: {
@@ -33,6 +34,15 @@ const adverListSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  browserURI: {
+    type: String,
+  },
+  mobileAppURI: {
+    type: String,
+  },
+  likes: [{ type: ObjectId, ref: "user" }],
+  watch: [{ type: ObjectId, ref: "user" }],
+  share: [{ type: ObjectId, ref: "user" }],
 });
 
 const AdvertList = mongoose.model("advert_list", adverListSchema);
