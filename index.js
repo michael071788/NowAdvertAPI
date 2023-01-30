@@ -52,6 +52,7 @@ app
   .post("/profile-image/:id", async (req, res) => {
     const userData = await User.findById(req.params.id);
 
+
     upload(req, res, async (err) => {
       if (err) {
         console.log(err);
@@ -79,3 +80,4 @@ app
     });
   })
   .listen(PORT, () => console.log(`Listening on ${PORT}`));
+

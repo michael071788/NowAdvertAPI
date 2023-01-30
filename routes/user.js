@@ -40,6 +40,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+
 // find specific user
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
@@ -53,6 +54,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // update user info
+
 router.patch("/update/:id", async (req, res) => {
   try {
     const userId = await User.findById(req.params.id);
@@ -63,6 +65,7 @@ router.patch("/update/:id", async (req, res) => {
     res.status(404).send({ error: "User is not found!" });
   }
 });
+
 
 // update user password
 router.patch("/update-password/:id", async (req, res) => {
@@ -104,7 +107,7 @@ router.patch("/update-password/:id", async (req, res) => {
   }
 });
 
-// register user
+
 router.post("/signup", async (req, res) => {
   try {
     // validate user inputs
