@@ -74,8 +74,6 @@ app
 
         return res.status(201).send({
           message: "successfully",
-          status: res.statusCode,
-          userData,
         });
       }
     });
