@@ -4,15 +4,6 @@ const Post = require("../models/post");
 
 // Get Back All The Posts
 router.get("/", async (req, res) => {
-  // try {
-  //   // const posts = await Post.find();
-  //   // res.json(posts);
-
-  //   res.send("This is all get all posts");
-  // } catch (err) {
-  //   // res.json({ message: err });
-  //   res.send("This is all get all posts error message");
-  // }
   try {
     const posts = await Post.find();
     res.json(posts);
